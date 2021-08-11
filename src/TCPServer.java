@@ -18,7 +18,8 @@ class TCPServer {
 
         ServerSocket welcomeSocket = new ServerSocket(6789);
 
-        while (true) {
+		//noinspection InfiniteLoopStatement
+		while (true) {
 
             Socket connectionSocket = welcomeSocket.accept();
 
