@@ -9,6 +9,7 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 
 class TCPServer {
 
@@ -20,8 +21,12 @@ class TCPServer {
 
 		//noinspection InfiniteLoopStatement
 		while (true) {
-		    Connection connection = new Connection(welcomeSocket.accept());
-		    connection.writeOutput(connection.input.toUpperCase());
+		    try {
+                Connection connection = new Connection(welcomeSocket.accept());
+                connection.writeOutput(connection.input.toUpperCase());
+            } catch (SocketException | NullPointerException e) {
+		        System.out.println("Lost Connection to Client, restarting");
+            }
         }
     }
 } 
