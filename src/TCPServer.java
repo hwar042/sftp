@@ -4,30 +4,37 @@
   All Rights Reserved.
  */
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 
 class TCPServer {
+    static Connection connection;
 
+    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] argv) throws Exception {
         String clientSentence;
         String capitalizedSentence;
 
         ServerSocket welcomeSocket = new ServerSocket(6789);
 
-		//noinspection InfiniteLoopStatement
-		while (true) {
-		    try {
-                Connection connection = new Connection(welcomeSocket.accept());
-                connection.writeOutput(connection.input.toUpperCase());
+
+        while (true) {
+            try {
+                // Receive Client Connection
+                connection = new Connection(welcomeSocket.accept());
+                // First output should be connection info:
+                connection.writeOutput("+hwar042 SFTP Service");
+                // Start another loop while connected
+                while (true) {
+                    connection = new Connection(welcomeSocket.accept());
+                    connection.writeOutput(connection.input.toUpperCase());
+                }
             } catch (SocketException | NullPointerException e) {
-		        System.out.println("Lost Connection to Client, restarting");
+                System.out.println("Lost Connection to Client, restarting");
             }
         }
     }
+
+
 } 
 
