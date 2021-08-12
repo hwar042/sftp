@@ -27,11 +27,35 @@ class TCPServer {
                 // Start another loop while connected
                 while (true) {
                     connection = new Connection(welcomeSocket.accept());
-                    connection.writeOutput(connection.input.toUpperCase());
+                    cmdSelect(connection.input);
+                    //connection.writeOutput(connection.input.toUpperCase());
                 }
             } catch (SocketException | NullPointerException e) {
                 System.out.println("Lost Connection to Client, restarting");
             }
+        }
+    }
+
+    private static void cmdSelect(String message) {
+        String cmd = message.substring(0,4);
+        String args = message.substring(4);
+        int argCount = args.replaceAll("[^ ]", "").length();
+        switch (cmd.toUpperCase()) {
+            case "USER" -> user(args, argCount);
+            default -> unknown();
+        }
+    }
+
+    private static void unknown() {
+        connection.writeOutput("-Unknown command, try again");
+    }
+
+    private static void user(String args, int argCount) {
+        // user takes 1 arg
+        if (argCount != 1) {
+            connection.writeOutput("-Invalid user-id, try again");
+        } else {
+            connection.writeOutput("Got a User!");
         }
     }
 
