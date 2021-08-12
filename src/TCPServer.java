@@ -4,19 +4,21 @@
   All Rights Reserved.
  */
 
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 class TCPServer {
     static Connection connection;
+    static ArrayList<String[]> users;
+    static ArrayList<String[]> accts;
 
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] argv) throws Exception {
-        String clientSentence;
-        String capitalizedSentence;
-
+        initDatabase();
         ServerSocket welcomeSocket = new ServerSocket(6789);
-
 
         while (true) {
             try {
@@ -52,11 +54,25 @@ class TCPServer {
 
     private static void user(String args, int argCount) {
         // user takes 1 arg
-        if (argCount != 1) {
+        if (argCount != 1 || !checkUser(args.substring(1))) {
             connection.writeOutput("-Invalid user-id, try again");
         } else {
             connection.writeOutput("Got a User!");
         }
+    }
+
+    private static void initDatabase() {
+        users = new Reader().readDatabase( new File("./src/database/users.txt"));
+        accts = new Reader().readDatabase( new File("./src/database/accts.txt"));
+    }
+
+    private static boolean checkUser(String user) {
+        for (String[] strings : users) {
+            if (strings[0].contains(user)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
