@@ -7,6 +7,7 @@ import java.net.Socket;
 public class Connection {
     Socket socket;
     String input;
+    boolean connected = true;
 
     public Connection(Socket socket) {
         this.socket = socket;
