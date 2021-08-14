@@ -18,11 +18,7 @@ public class Connection {
         }
     }
 
-    public void writeOutput(String message) {
-        try {
+    public void writeOutput(String message) throws IOException {
             new DataOutputStream(socket.getOutputStream()).writeBytes(message + '\n');
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

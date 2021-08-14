@@ -23,18 +23,14 @@ class TCPServer {
         accts = new Reader().readDatabase( new File("./src/database/accts.txt"));
     }
 
-    private static void disconnect() {
-        auth = new Auth();
-        connection.connected = false;
-    }
-
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] argv) throws Exception {
         initDatabase();
         ServerSocket welcomeSocket = new ServerSocket(6789);
-        auth = new Auth();
         while (true) {
             try {
+                // Generate new Authentication
+                auth = new Auth();
                 // Receive Client Connection
                 connection = new Connection(welcomeSocket.accept());
                 // First output should be connection info:
@@ -53,7 +49,7 @@ class TCPServer {
                         connection.writeOutput("-Error! use format: <cmd> [<SPACE> <args>]");
                     }
                     // Disconnect Client if '-' received
-                    if (output.charAt(0) == '-') disconnect();
+                    if (output.charAt(0) == '-') System.out.println("error detected");
                     // Send Message to Client
                     connection.writeOutput(output);
                 }
@@ -151,7 +147,7 @@ class TCPServer {
             // Log in if matching account
             if (auth.t_acct) {
                 auth.setAuth();
-                connection.writeOutput("! Logged in");
+                output = ("! Logged in");
             }
             else {
                 // Pass pass, request account
