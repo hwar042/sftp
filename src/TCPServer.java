@@ -19,8 +19,8 @@ class TCPServer {
 
     private static void initDatabase() {
         // Reads Users and Accounts into memory
-        users = new Reader().readDatabase( new File("./src/database/users.txt"));
-        accts = new Reader().readDatabase( new File("./src/database/accts.txt"));
+        users = new Reader().readDatabase(new File("./src/database/users.txt"));
+        accts = new Reader().readDatabase(new File("./src/database/accts.txt"));
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
@@ -63,7 +63,7 @@ class TCPServer {
 
     private static void cmdSelect(String message) {
         // Get Command and Argument Strings
-        String cmd = message.substring(0,4);
+        String cmd = message.substring(0, 4);
         String args = message.substring(4);
         // Get Number of Arguments
         int argCount = args.replaceAll("[^ ]", "").length();
@@ -72,15 +72,20 @@ class TCPServer {
             case "USER" -> user(args, argCount);
             case "ACCT" -> acct(args, argCount);
             case "PASS" -> pass(args, argCount);
+            case "TYPE" -> type(args, argCount);
             default -> unknown();
         }
+    }
+
+    private static void unknown() {
+        output = "-Unknown command, try again";
     }
 
     private static void user(String args, int argCount) {
         // Manages User Command
         String user = args.substring(1);
         // Already Authorized?
-        if (auth.auth) output = "!"+ user +" logged in";
+        if (auth.auth) output = "!" + user + " logged in";
             // Command in Correct Form, user exists
             // user takes 1 arg
         else if (argCount != 1 || checkInvalid(user, users)) output = "-Invalid user-id, try again";
@@ -91,9 +96,8 @@ class TCPServer {
             if (checkSuperUser(user)) {
                 // Log in if not
                 auth.setAuth();
-                output = "!"+ user +" logged in";
-            }
-            else {
+                output = "!" + user + " logged in";
+            } else {
                 // Pass User, request account
                 auth.setT_user();
                 output = "+User-id valid, send account and password";
@@ -119,8 +123,7 @@ class TCPServer {
             if (auth.t_pass) {
                 auth.setAuth();
                 output = "! Account valid, logged-in";
-            }
-            else {
+            } else {
                 // Pass account, request password
                 auth.setT_acct();
                 // Set Required Password
@@ -148,14 +151,24 @@ class TCPServer {
             if (auth.t_acct) {
                 auth.setAuth();
                 output = ("! Logged in");
-            }
-            else {
+            } else {
                 // Pass pass, request account
                 auth.setT_pass();
                 // Set required Account
                 setAcct(pass);
                 output = "+Send account";
             }
+        }
+    }
+
+    private static void type(String args, int argCount) {
+        switch (args.substring(1)) {
+            case "A" -> output = "+Using ASCII mode";
+            case "B" -> output = "+Using Binary mode";
+            case "C" -> output = "+Using Continuous mode";
+        }
+        if (argCount != 1) {
+            output = "-Type not valid";
         }
     }
 
@@ -205,10 +218,6 @@ class TCPServer {
                 auth.setAcct(strings[0]);
             }
         }
-    }
-
-    private static void unknown() {
-        output = "-Unknown command, try again";
     }
 
 
