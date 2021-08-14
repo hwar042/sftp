@@ -46,10 +46,10 @@ class TCPServer {
                     }
                     // Catch incorrectly formed argument
                     catch (StringIndexOutOfBoundsException e) {
-                        connection.writeOutput("-Error! use format: <cmd> [<SPACE> <args>]");
+                        output = ("-Error! use format: <cmd> [<SPACE> <args>]");
                     }
                     // Disconnect Client if '-' received
-                    if (output.charAt(0) == '-') System.out.println("error detected");
+                    if (output.charAt(0) == '-') connection.connected = false;
                     // Send Message to Client
                     connection.writeOutput(output);
                 }
@@ -68,12 +68,21 @@ class TCPServer {
         // Get Number of Arguments
         int argCount = args.replaceAll("[^ ]", "").length();
         // Call Method Based on Command
-        switch (cmd.toUpperCase()) {
-            case "USER" -> user(args, argCount);
-            case "ACCT" -> acct(args, argCount);
-            case "PASS" -> pass(args, argCount);
-            case "TYPE" -> type(args, argCount);
-            default -> unknown();
+        if (!auth.auth) {
+            switch (cmd.toUpperCase()) {
+                case "USER" -> user(args, argCount);
+                case "ACCT" -> acct(args, argCount);
+                case "PASS" -> pass(args, argCount);
+                default -> unknown();
+            }
+        } else {
+            switch (cmd.toUpperCase()) {
+                case "USER" -> user(args, argCount);
+                case "ACCT" -> acct(args, argCount);
+                case "PASS" -> pass(args, argCount);
+                case "TYPE" -> type(args, argCount);
+                default -> unknown();
+            }
         }
     }
 
@@ -162,7 +171,7 @@ class TCPServer {
     }
 
     private static void type(String args, int argCount) {
-        switch (args.substring(1)) {
+        switch (args.substring(1).toUpperCase()) {
             case "A" -> output = "+Using ASCII mode";
             case "B" -> output = "+Using Binary mode";
             case "C" -> output = "+Using Continuous mode";
