@@ -5,10 +5,10 @@
  */
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Date;
 
 class TCPServer {
     static Connection connection;
@@ -84,12 +84,11 @@ class TCPServer {
                 case "PASS" -> pass(args, argCount);
                 case "TYPE" -> type(args, argCount);
                 case "LIST" -> list(args, argCount);
+                case "CDIR" -> cdir(args, argCount);
                 default -> unknown();
             }
         }
     }
-
-
 
     private static void unknown() {
         output = "-Unknown command, try again";
@@ -188,7 +187,7 @@ class TCPServer {
 
     private static void list(String args, int argCount) {
         // Get Listing
-        String listing = args.substring(1,2);
+        String listing = args.substring(1, 2);
         // Check correct Listing
         if (listing.equalsIgnoreCase("f") || listing.equalsIgnoreCase("v")) {
             // Get Path
@@ -204,24 +203,33 @@ class TCPServer {
             StringBuilder fileList = new StringBuilder();
             // Check directory not empty
             if (files != null) {
+                fileList.append("+").append(path).append("\n");
                 for (File f : files) {
                     String file = f.getName();
                     // Append / to directory
                     if (f.isDirectory()) file = file + "/";
                     // Formatted listing
                     if (listing.equalsIgnoreCase("f")) fileList.append(file).append(" \r\n");
-                    // Verbose listing
+                        // Verbose listing
                     else {
                         fileList.append(file).append(" ").
-                                append(f.lastModified()).append(" ").
-                                append(f.length()).append(" \r\n");
-
+                                append(new Date(f.lastModified())).append(" ").
+                                append(f.length()).append(" bytes").append(" \r\n");
                     }
                 }
                 output = fileList.toString();
-            }
-            else output = "+";
+            } else output = "-non-existent directory";
         } else output = "-invalid file listing format";
+    }
+
+    private static void cdir(String args, int argCount) {
+        File dir = new File(args.substring(1));
+        if (dir.exists()) {
+            currentDir = dir;
+            output = "!Changed working dir to " + dir.getPath();
+        } else {
+            output = "-Can't connect to directory because: directory does not exist";
+        }
     }
 
     private static boolean checkInvalid(String string, ArrayList<String[]> data) {
