@@ -85,6 +85,7 @@ class TCPServer {
                 case "TYPE" -> type(args, argCount);
                 case "LIST" -> list(args, argCount);
                 case "CDIR" -> cdir(args, argCount);
+                case "KILL" -> kill(args, argCount);
                 default -> unknown();
             }
         }
@@ -229,6 +230,15 @@ class TCPServer {
             output = "!Changed working dir to " + dir.getPath();
         } else {
             output = "-Can't connect to directory because: directory does not exist";
+        }
+    }
+
+    private static void kill(String args, int argCount) {
+        File file = new File(currentDir.getPath() + "/" + args.substring(1));
+        if (file.delete()) {
+            output = "+" + file + " deleted";
+        } else if (!file.exists()) {
+            output = "-Not deleted because file does not exist";
         }
     }
 
