@@ -5,6 +5,7 @@
  */
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ class TCPServer {
     static ArrayList<String[]> accts;
     static String input;
     static String output;
+    static File currentDir = new File(System.getProperty("user.dir"));
 
     private static void initDatabase() {
         // Reads Users and Accounts into memory
@@ -81,10 +83,13 @@ class TCPServer {
                 case "ACCT" -> acct(args, argCount);
                 case "PASS" -> pass(args, argCount);
                 case "TYPE" -> type(args, argCount);
+                case "LIST" -> list(args, argCount);
                 default -> unknown();
             }
         }
     }
+
+
 
     private static void unknown() {
         output = "-Unknown command, try again";
@@ -179,6 +184,44 @@ class TCPServer {
         if (argCount != 1) {
             output = "-Type not valid";
         }
+    }
+
+    private static void list(String args, int argCount) {
+        // Get Listing
+        String listing = args.substring(1,2);
+        // Check correct Listing
+        if (listing.equalsIgnoreCase("f") || listing.equalsIgnoreCase("v")) {
+            // Get Path
+            File path;
+            try {
+                path = new File(args.substring(3));
+            }
+            // Set null path to Current Directory
+            catch (StringIndexOutOfBoundsException e) {
+                path = currentDir;
+            }
+            File[] files = path.listFiles();
+            StringBuilder fileList = new StringBuilder();
+            // Check directory not empty
+            if (files != null) {
+                for (File f : files) {
+                    String file = f.getName();
+                    // Append / to directory
+                    if (f.isDirectory()) file = file + "/";
+                    // Formatted listing
+                    if (listing.equalsIgnoreCase("f")) fileList.append(file).append(" \r\n");
+                    // Verbose listing
+                    else {
+                        fileList.append(file).append(" ").
+                                append(f.lastModified()).append(" ").
+                                append(f.length()).append(" \r\n");
+
+                    }
+                }
+                output = fileList.toString();
+            }
+            else output = "+";
+        } else output = "-invalid file listing format";
     }
 
     private static boolean checkInvalid(String string, ArrayList<String[]> data) {
