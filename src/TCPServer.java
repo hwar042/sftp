@@ -88,6 +88,7 @@ class TCPServer {
                 case "CDIR" -> cdir(args, argCount);
                 case "KILL" -> kill(args, argCount);
                 case "NAME" -> name(args, argCount);
+                case "TOBE" -> tobe(args, argCount);
                 default -> unknown();
             }
         }
@@ -250,8 +251,25 @@ class TCPServer {
             currentFile = file;
         } else {
             output = "-Can't find " + file;
+            currentFile = null;
         }
     }
+
+    private static void tobe(String args, int argCount) {
+        String oldFile = currentFile.getPath();
+        File file = new File(currentDir.getPath() + "/" + args.substring(1));
+        if (currentFile != null) {
+            if (currentFile.renameTo(file)) {
+                output = "+" + oldFile + " was renamed to " + file.getPath();
+            } else {
+                output = "-File wasn't renamed because file with dest path already exists";
+            }
+        } else {
+            output = "-File wasn't renamed because no file selected via NAME";
+        }
+        currentFile = null;
+    }
+
 
     private static boolean checkInvalid(String string, ArrayList<String[]> data) {
         // Checks Data Structures for Strings, confirms if found
