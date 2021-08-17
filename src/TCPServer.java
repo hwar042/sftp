@@ -84,15 +84,17 @@ class TCPServer {
                 case "ACCT" -> acct(args, argCount);
                 case "PASS" -> pass(args, argCount);
                 case "TYPE" -> type(args, argCount);
-                case "LIST" -> list(args, argCount);
-                case "CDIR" -> cdir(args, argCount);
-                case "KILL" -> kill(args, argCount);
-                case "NAME" -> name(args, argCount);
-                case "TOBE" -> tobe(args, argCount);
+                case "LIST" -> list(args);
+                case "CDIR" -> cdir(args);
+                case "KILL" -> kill(args);
+                case "NAME" -> name(args);
+                case "TOBE" -> tobe(args);
+                case "DONE" -> done();
                 default -> unknown();
             }
         }
     }
+
     private static void unknown() {
         output = "-Unknown command, try again";
     }
@@ -188,7 +190,7 @@ class TCPServer {
         }
     }
 
-    private static void list(String args, int argCount) {
+    private static void list(String args) {
         // Get Listing
         String listing = args.substring(1, 2);
         // Check correct Listing
@@ -225,7 +227,7 @@ class TCPServer {
         } else output = "-invalid file listing format";
     }
 
-    private static void cdir(String args, int argCount) {
+    private static void cdir(String args) {
         File dir = new File(args.substring(1));
         if (dir.exists()) {
             currentDir = dir;
@@ -235,7 +237,7 @@ class TCPServer {
         }
     }
 
-    private static void kill(String args, int argCount) {
+    private static void kill(String args) {
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
         if (file.delete()) {
             output = "+" + file + " deleted";
@@ -244,7 +246,7 @@ class TCPServer {
         }
     }
 
-    private static void name(String args, int argCount) {
+    private static void name(String args) {
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
         if (file.exists()) {
             output = "+File exists";
@@ -255,7 +257,7 @@ class TCPServer {
         }
     }
 
-    private static void tobe(String args, int argCount) {
+    private static void tobe(String args) {
         String oldFile = currentFile.getPath();
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
         if (currentFile != null) {
@@ -270,6 +272,10 @@ class TCPServer {
         currentFile = null;
     }
 
+    private static void done() {
+        output = "+closing connection";
+        connection.connected = false;
+    }
 
     private static boolean checkInvalid(String string, ArrayList<String[]> data) {
         // Checks Data Structures for Strings, confirms if found
