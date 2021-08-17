@@ -18,6 +18,7 @@ class TCPServer {
     static String input;
     static String output;
     static File currentDir = new File(System.getProperty("user.dir"));
+    static File currentFile;
 
     private static void initDatabase() {
         // Reads Users and Accounts into memory
@@ -86,11 +87,11 @@ class TCPServer {
                 case "LIST" -> list(args, argCount);
                 case "CDIR" -> cdir(args, argCount);
                 case "KILL" -> kill(args, argCount);
+                case "NAME" -> name(args, argCount);
                 default -> unknown();
             }
         }
     }
-
     private static void unknown() {
         output = "-Unknown command, try again";
     }
@@ -239,6 +240,16 @@ class TCPServer {
             output = "+" + file + " deleted";
         } else if (!file.exists()) {
             output = "-Not deleted because file does not exist";
+        }
+    }
+
+    private static void name(String args, int argCount) {
+        File file = new File(currentDir.getPath() + "/" + args.substring(1));
+        if (file.exists()) {
+            output = "+File exists";
+            currentFile = file;
+        } else {
+            output = "-Can't find " + file;
         }
     }
 
