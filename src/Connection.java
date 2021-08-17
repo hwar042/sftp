@@ -19,6 +19,9 @@ public class Connection {
     }
 
     public void writeOutput(String message) throws IOException {
-            new DataOutputStream(socket.getOutputStream()).writeBytes(message + '\n');
+            System.out.println("Writing to Client");
+            DataOutputStream send = new DataOutputStream(socket.getOutputStream());
+            send.writeBytes(message + "\n");
+            send.close();
     }
 }
