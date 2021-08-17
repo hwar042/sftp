@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.Scanner;
 
 class TCPClient {
 
@@ -16,13 +17,12 @@ class TCPClient {
         while(true) {
             BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
             Socket clientSocket = new Socket("localhost", 6789);
-            BufferedReader receiveStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            Scanner reader = new Scanner(new InputStreamReader(clientSocket.getInputStream()));
             DataOutputStream sendStream = new DataOutputStream(clientSocket.getOutputStream());
-
-
             sendStream.writeBytes(userInput.readLine() + '\n');
-            System.out.println("FROM SERVER: " + receiveStream.readLine());
-
+            while (reader.hasNext()) {
+                System.out.println(reader.nextLine());
+            }
             clientSocket.close();
         }
 
