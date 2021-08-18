@@ -23,4 +23,12 @@ public class Connection {
             send.writeBytes(message + "\n");
             send.close();
     }
+
+    public void writeFile(byte[] buffer) throws IOException {
+        DataOutputStream send = new DataOutputStream(socket.getOutputStream());
+        for (byte b : buffer) {
+            send.write(b);
+        }
+        send.close();
+    }
 }

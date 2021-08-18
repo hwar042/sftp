@@ -5,8 +5,11 @@
  */
 
 import java.io.File;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -17,8 +20,10 @@ class TCPServer {
     static ArrayList<String[]> accts;
     static String input;
     static String output;
+    static byte[] outputFile = null;
     static File currentDir = new File(System.getProperty("user.dir"));
-    static File currentFile;
+    static File renameFile = null;
+    static File getFile = null;
 
     private static void initDatabase() {
         // Reads Users and Accounts into memory
@@ -51,10 +56,16 @@ class TCPServer {
                     catch (StringIndexOutOfBoundsException e) {
                         output = ("-Error! use format: <cmd> [<SPACE> <args>]");
                     }
-                    // Disconnect Client if '-' received
-                    if (output.charAt(0) == '-') connection.connected = false;
-                    // Send Message to Client
-                    connection.writeOutput(output);
+                    // Check if file is being sent
+                    if (outputFile != null) {
+                        connection.writeFile(outputFile);
+                        outputFile = null;
+                    } else {
+                        // Disconnect Client if '-' received
+                        if (output.charAt(0) == '-') connection.connected = false;
+                        // Send Message to Client
+                        connection.writeOutput(output);
+                    }
                 }
             }
             // Restart Server if Client disconnects
@@ -90,6 +101,8 @@ class TCPServer {
                 case "NAME" -> name(args);
                 case "TOBE" -> tobe(args);
                 case "DONE" -> done();
+                case "RETR" -> retr(args);
+                case "SEND" -> send();
                 default -> unknown();
             }
         }
@@ -250,18 +263,18 @@ class TCPServer {
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
         if (file.exists()) {
             output = "+File exists";
-            currentFile = file;
+            renameFile = file;
         } else {
             output = "-Can't find " + file;
-            currentFile = null;
+            renameFile = null;
         }
     }
 
     private static void tobe(String args) {
-        String oldFile = currentFile.getPath();
+        String oldFile = renameFile.getPath();
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
-        if (currentFile != null) {
-            if (currentFile.renameTo(file)) {
+        if (renameFile != null) {
+            if (renameFile.renameTo(file)) {
                 output = "+" + oldFile + " was renamed to " + file.getPath();
             } else {
                 output = "-File wasn't renamed because file with dest path already exists";
@@ -269,12 +282,31 @@ class TCPServer {
         } else {
             output = "-File wasn't renamed because no file selected via NAME";
         }
-        currentFile = null;
+        renameFile = null;
     }
 
     private static void done() {
         output = "+closing connection";
         connection.connected = false;
+    }
+
+    private static void retr(String args) {
+        File file = new File(currentDir.getPath() + "/" + args.substring(1));
+        if (file.exists() && !file.isDirectory()) {
+            getFile = file;
+            output = String.valueOf(file.length());
+        } else {
+            getFile = null;
+            output = "-File doesn't exist";
+        }
+    }
+
+    private static void send() {
+        try {
+            outputFile = Files.readAllBytes(Path.of(getFile.getAbsolutePath()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static boolean checkInvalid(String string, ArrayList<String[]> data) {
