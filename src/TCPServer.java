@@ -41,6 +41,7 @@ class TCPServer {
                 auth = new Auth();
                 // Receive Client Connection
                 connection = new Connection(welcomeSocket.accept());
+                connection.getInput();
                 // First output should be connection info:
                 connection.writeOutput("+hwar042 SFTP Service");
                 // Start another loop while connected
@@ -48,7 +49,7 @@ class TCPServer {
                     // New Connection from client
                     connection = new Connection(welcomeSocket.accept());
                     // Get Input
-                    input = connection.input;
+                    input = connection.getInput();
                     try {
                         cmdSelect(input);
                     }

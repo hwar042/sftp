@@ -6,16 +6,20 @@ import java.net.Socket;
 
 public class Connection {
     Socket socket;
-    String input;
     boolean connected = true;
 
     public Connection(Socket socket) {
         this.socket = socket;
+    }
+
+    public String getInput() {
+        String input = "";
         try {
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
+            input =  new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return input;
     }
 
     public void writeOutput(String message) throws IOException {
