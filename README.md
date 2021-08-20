@@ -1,2 +1,2 @@
 # sftp
- An implementation of the SFTP Protocol in Java
+ An implementation of the (simple) SFTP Protocol in Java
