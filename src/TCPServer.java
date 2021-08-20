@@ -20,10 +20,13 @@ class TCPServer {
     static ArrayList<String[]> accts;
     static String input;
     static String output;
-    static byte[] outputFile = null;
     static File currentDir = new File(System.getProperty("user.dir"));
-    static File renameFile = null;
-    static File getFile = null;
+    static File nameFile = null;
+    static byte[] sendFile = null;
+    static File retrFile = null;
+    static File storFile = null;
+    static boolean storAppend = false;
+    static long storSize = 0;
 
     private static void initDatabase() {
         // Reads Users and Accounts into memory
@@ -48,31 +51,59 @@ class TCPServer {
                 while (connection.connected) {
                     // New Connection from client
                     connection = new Connection(welcomeSocket.accept());
-                    // Get Input
-                    input = connection.getInput();
-                    try {
-                        cmdSelect(input);
+                    // Check if File expected
+                    if (storSize > 0) {
+                        getFile();
                     }
-                    // Catch incorrectly formed argument
-                    catch (StringIndexOutOfBoundsException e) {
-                        output = ("-Error! use format: <cmd> [<SPACE> <args>]");
-                    }
-                    // Check if file is being sent
-                    if (outputFile != null) {
-                        connection.writeFile(outputFile);
-                        outputFile = null;
-                    } else {
-                        // Disconnect Client if '-' received
-                        if (output.charAt(0) == '-') connection.connected = false;
-                        // Send Message to Client
-                        connection.writeOutput(output);
+                    else {
+                        getText();
                     }
                 }
             }
             // Restart Server if Client disconnects
             catch (SocketException | NullPointerException e) {
                 System.out.println("Lost Connection to Client, restarting");
+                e.printStackTrace();
             }
+        }
+    }
+
+    private static void getFile() throws IOException {
+        try {
+            connection.getFile(storFile,storSize,storAppend);
+            output = "+Saved " + storFile.getName();
+        } catch (IOException e) {
+            output = "-Couldn't save because of an I/O error";
+        }
+        storFile = null;
+        storSize = 0;
+        storAppend = false;
+        writeOutput();
+    }
+
+    private static void getText() throws IOException {
+        // Get Input
+        input = connection.getInput();
+        try {
+            cmdSelect(input);
+        }
+        // Catch incorrectly formed argument
+        catch (StringIndexOutOfBoundsException e) {
+            output = ("-Error! use format: <cmd> [<SPACE> <args>]");
+        }
+        writeOutput();
+    }
+
+    private static void writeOutput() throws IOException {
+        // Check if file is being sent
+        if (sendFile != null) {
+            connection.writeFile(sendFile);
+            sendFile = null;
+        } else {
+            // Disconnect Client if '-' received
+            if (output.charAt(0) == '-') connection.connected = false;
+            // Send Message to Client
+            connection.writeOutput(output);
         }
     }
 
@@ -104,6 +135,8 @@ class TCPServer {
                 case "DONE" -> done();
                 case "RETR" -> retr(args);
                 case "SEND" -> send();
+                case "STOR" -> stor(args);
+                case "SIZE" -> size(args);
                 default -> unknown();
             }
         }
@@ -264,18 +297,18 @@ class TCPServer {
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
         if (file.exists()) {
             output = "+File exists";
-            renameFile = file;
+            nameFile = file;
         } else {
             output = "-Can't find " + file;
-            renameFile = null;
+            nameFile = null;
         }
     }
 
     private static void tobe(String args) {
-        String oldFile = renameFile.getPath();
+        String oldFile = nameFile.getPath();
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
-        if (renameFile != null) {
-            if (renameFile.renameTo(file)) {
+        if (nameFile != null) {
+            if (nameFile.renameTo(file)) {
                 output = "+" + oldFile + " was renamed to " + file.getPath();
             } else {
                 output = "-File wasn't renamed because file with dest path already exists";
@@ -283,7 +316,7 @@ class TCPServer {
         } else {
             output = "-File wasn't renamed because no file selected via NAME";
         }
-        renameFile = null;
+        nameFile = null;
     }
 
     private static void done() {
@@ -294,19 +327,69 @@ class TCPServer {
     private static void retr(String args) {
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
         if (file.exists() && !file.isDirectory()) {
-            getFile = file;
+            retrFile = file;
             output = String.valueOf(file.length());
         } else {
-            getFile = null;
+            retrFile = null;
             output = "-File doesn't exist";
         }
     }
 
     private static void send() {
         try {
-            outputFile = Files.readAllBytes(Path.of(getFile.getAbsolutePath()));
+            sendFile = Files.readAllBytes(Path.of(retrFile.getAbsolutePath()));
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void stor(String args) {
+        String cmd = args.substring(1, 4);
+        storFile = new File(currentDir.getPath() + "/" + args.substring(5));
+        switch (cmd.toUpperCase()) {
+            case "NEW" -> {
+                if (storFile.isFile()) {
+                    output = "-File exists, but system doesn't support generations";
+                } else {
+                    output = "+File does not exist, will create new file";
+                }
+            }
+            case "OLD" -> {
+                if (storFile.isFile()) {
+                    output = "+Will write over old file";
+                } else {
+                    output = "+Will create new file";
+                }
+            }
+            case "APP" -> {
+                if (storFile.isFile()) {
+                    output = "+Will append to file";
+                    storAppend = true;
+                } else {
+                    output = "+Will create file";
+                }
+            }
+            default -> {
+                output = "-unknown STOR flag, use NEW, OLD or APP";
+                storFile = null;
+            }
+        }
+    }
+
+    private static void size(String args) {
+        if (storFile != null) {
+            try {
+                storSize = Long.parseLong(args.substring(1));
+                if (currentDir.getFreeSpace() > storSize) {
+                    output = "+ok, waiting for file";
+                } else {
+                    output = "-Not enough room, don't send it";
+                    storFile = null;
+                    storSize = 0;
+                }
+            } catch (NumberFormatException e) {
+                output = "-Incorrect number format";
+            }
         }
     }
 
