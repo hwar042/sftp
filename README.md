@@ -9,10 +9,12 @@ https://datatracker.ietf.org/doc/html/rfc913
 
 The System has been built with JDK 8 (Java 1.8).
 * Clone the repository to a local disk
-* Open the repository in an IDE (InteliJ used for this project)
-* Build and Launch TCPServer
-* Build and Launch TCPClient
-* Enter Commands from the terminal window of TCP Client
+* Navigate to `sftp/src/` (where sftp is the cloned directory)
+* Build the client from the command line: `javac TCPClient.java`
+* Build the server from the command line: `javac TCPServer.java`
+* Start the server from the command line: `java TCPServer`
+* From a **separate** terminal instance, start the client from the command line: `java TCPClient`
+* Enter Client commands from the client terminal
 
 ## Server Behaviour
 * Expected Welcome Message: `+hwar042 SFTP Service`
@@ -57,6 +59,6 @@ The Following Commands are only available immediately after `RETR`:
 The Following Commands are only available immediately after `STORE` (each command must follow the previous):
 | Command | Description   | Returns  |
 | --------|-------------  | ------   |
-| `SIZE <file-size>` | Specifies the size of the file to be stored (must match) | `+ok, waiting for file` </br> `-Not enough room, don't send it` </br> `-Incorrect number format`|
+| `SIZE <file-size>` | Specifies the size of the file to be stored (must match) | `+ok, waiting for file` </br> **and** `Enter Absolute Filepath of File to Send` </br> `-Not enough room, don't send it` </br> `-Incorrect number format`|
  | `<path-of-file-to-be-sent>` | Sends the file at the specified path | `+Saved <file-spec>` </br> `-Couldn't save because of an I/O error`|
 
