@@ -50,7 +50,7 @@ The Following Commands are only available immediately after `NAME`:
 The Following Commands are only available immediately after `RETR`:
 | Command | Description   | Returns  |
 | --------|-------------  | ------   |
-| `SEND` | Sends requested file | `<requested file>` * |
+| `SEND` | Sends requested file | `<requested file>` (to specified directory)* </br> **and** `+File received` |
 
 <sub>\* The location to store the file is specified as a field in TCPClient.java<sub>
  
