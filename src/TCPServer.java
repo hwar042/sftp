@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.SocketException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -20,18 +20,32 @@ class TCPServer {
     static ArrayList<String[]> accts;
     static String input;
     static String output;
-    static File currentDir = new File(System.getProperty("user.dir"));
-    static File nameFile = null;
-    static byte[] sendFile = null;
-    static File retrFile = null;
-    static File storFile = null;
-    static boolean storAppend = false;
-    static long storSize = 0;
+    static File currentDir;
+    static File nameFile;
+    static byte[] sendFile;
+    static File retrFile;
+    static File storFile;
+    static boolean storAppend;
+    static long storSize;
 
     private static void initDatabase() {
         // Reads Users and Accounts into memory
-        users = new Reader().readDatabase(new File("./src/database/users.txt"));
-        accts = new Reader().readDatabase(new File("./src/database/accts.txt"));
+        users = new Reader().readDatabase(new File("database/users.txt"));
+        accts = new Reader().readDatabase(new File("database/accts.txt"));
+    }
+
+    private static void initServer() {
+        // Set default directory
+        currentDir = new File(System.getProperty("user.dir"));
+        // Generate new Authentication (ie logged out)
+        auth = new Auth();
+        // Initialize File Info
+        nameFile = null;
+        sendFile = null;
+        retrFile = null;
+        storFile = null;
+        storAppend = false;
+        storSize = 0;
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
@@ -39,9 +53,8 @@ class TCPServer {
         initDatabase();
         ServerSocket welcomeSocket = new ServerSocket(6789);
         while (true) {
+            initServer();
             try {
-                // Generate new Authentication
-                auth = new Auth();
                 // Receive Client Connection
                 connection = new Connection(welcomeSocket.accept());
                 connection.getInput();
@@ -54,10 +67,10 @@ class TCPServer {
                     // Check if File expected
                     if (storSize > 0) {
                         getFile();
-                    }
-                    else {
+                    } else {
                         getText();
                     }
+                    writeOutput();
                 }
             }
             // Restart Server if Client disconnects
@@ -70,7 +83,7 @@ class TCPServer {
 
     private static void getFile() throws IOException {
         try {
-            connection.getFile(storFile,storSize,storAppend);
+            connection.getFile(storFile, storSize, storAppend);
             output = "+Saved " + storFile.getName();
         } catch (IOException e) {
             output = "-Couldn't save because of an I/O error";
@@ -78,7 +91,6 @@ class TCPServer {
         storFile = null;
         storSize = 0;
         storAppend = false;
-        writeOutput();
     }
 
     private static void getText() throws IOException {
@@ -91,7 +103,6 @@ class TCPServer {
         catch (StringIndexOutOfBoundsException e) {
             output = ("-Error! use format: <cmd> [<SPACE> <args>]");
         }
-        writeOutput();
     }
 
     private static void writeOutput() throws IOException {
@@ -116,28 +127,64 @@ class TCPServer {
         // Call Method Based on Command
         if (!auth.auth) {
             switch (cmd.toUpperCase()) {
-                case "USER" -> user(args, argCount);
-                case "ACCT" -> acct(args, argCount);
-                case "PASS" -> pass(args, argCount);
-                default -> unknown();
+                case "USER":
+                    user(args, argCount);
+                    break;
+                case "ACCT":
+                    acct(args, argCount);
+                    break;
+                case "PASS":
+                    pass(args, argCount);
+                    break;
+                default:
+                    unknown();
             }
         } else {
             switch (cmd.toUpperCase()) {
-                case "USER" -> user(args, argCount);
-                case "ACCT" -> acct(args, argCount);
-                case "PASS" -> pass(args, argCount);
-                case "TYPE" -> type(args, argCount);
-                case "LIST" -> list(args);
-                case "CDIR" -> cdir(args);
-                case "KILL" -> kill(args);
-                case "NAME" -> name(args);
-                case "TOBE" -> tobe(args);
-                case "DONE" -> done();
-                case "RETR" -> retr(args);
-                case "SEND" -> send();
-                case "STOR" -> stor(args);
-                case "SIZE" -> size(args);
-                default -> unknown();
+                case "USER":
+                    user(args, argCount);
+                    break;
+                case "ACCT":
+                    acct(args, argCount);
+                    break;
+                case "PASS":
+                    pass(args, argCount);
+                    break;
+                case "TYPE":
+                    type(args, argCount);
+                    break;
+                case "LIST":
+                    list(args);
+                    break;
+                case "CDIR":
+                    cdir(args);
+                    break;
+                case "KILL":
+                    kill(args);
+                    break;
+                case "NAME":
+                    name(args);
+                    break;
+                case "TOBE":
+                    tobe(args);
+                    break;
+                case "DONE":
+                    done();
+                    break;
+                case "RETR":
+                    retr(args);
+                    break;
+                case "SEND":
+                    send();
+                    break;
+                case "STOR":
+                    stor(args);
+                    break;
+                case "SIZE":
+                    size(args);
+                    break;
+                default:
+                    unknown();
             }
         }
     }
@@ -156,7 +203,6 @@ class TCPServer {
         else if (argCount != 1 || checkInvalid(user, users)) output = "-Invalid user-id, try again";
             // Log in user
         else {
-            auth.setUser(user);
             // Check if Account Required
             if (checkSuperUser(user)) {
                 // Log in if not
@@ -228,9 +274,17 @@ class TCPServer {
 
     private static void type(String args, int argCount) {
         switch (args.substring(1).toUpperCase()) {
-            case "A" -> output = "+Using ASCII mode";
-            case "B" -> output = "+Using Binary mode";
-            case "C" -> output = "+Using Continuous mode";
+            case "A":
+                output = "+Using ASCII mode";
+                break;
+            case "B":
+                output = "+Using Binary mode";
+                break;
+            case "C":
+                output = "+Using Continuous mode";
+                break;
+            default :
+                output = "-Type not valid";
         }
         if (argCount != 1) {
             output = "-Type not valid";
@@ -314,7 +368,7 @@ class TCPServer {
                 output = "-File wasn't renamed because file with dest path already exists";
             }
         } else {
-            output = "-File wasn't renamed because no file selected via NAME";
+            unknown();
         }
         nameFile = null;
     }
@@ -337,9 +391,10 @@ class TCPServer {
 
     private static void send() {
         try {
-            sendFile = Files.readAllBytes(Path.of(retrFile.getAbsolutePath()));
+            sendFile = Files.readAllBytes(Paths.get(retrFile.getAbsolutePath()));
         } catch (IOException e) {
             e.printStackTrace();
+            unknown();
         }
     }
 
@@ -347,29 +402,32 @@ class TCPServer {
         String cmd = args.substring(1, 4);
         storFile = new File(currentDir.getPath() + "/" + args.substring(5));
         switch (cmd.toUpperCase()) {
-            case "NEW" -> {
+            case "NEW": {
                 if (storFile.isFile()) {
                     output = "-File exists, but system doesn't support generations";
                 } else {
                     output = "+File does not exist, will create new file";
                 }
+                break;
             }
-            case "OLD" -> {
+            case "OLD": {
                 if (storFile.isFile()) {
                     output = "+Will write over old file";
                 } else {
                     output = "+Will create new file";
                 }
+                break;
             }
-            case "APP" -> {
+            case "APP": {
                 if (storFile.isFile()) {
                     output = "+Will append to file";
                     storAppend = true;
                 } else {
                     output = "+Will create file";
                 }
+                break;
             }
-            default -> {
+            default: {
                 output = "-unknown STOR flag, use NEW, OLD or APP";
                 storFile = null;
             }

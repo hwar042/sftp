@@ -2,7 +2,7 @@ import java.io.*;
 import java.net.Socket;
 
 public class Connection {
-    Socket socket;
+    final Socket socket;
     boolean connected = true;
     DataOutputStream sendStream;
 
@@ -26,7 +26,6 @@ public class Connection {
         FileOutputStream fos = new FileOutputStream(file, append);
         BufferedOutputStream bos = new BufferedOutputStream(fos);
         // Set timeout
-        long time = System.currentTimeMillis();
         for (int i = 0; i < filesize; i++) {
             bos.write(bis.read());
         }
@@ -35,16 +34,14 @@ public class Connection {
     }
 
     public void writeOutput(String message) throws IOException {
-        DataOutputStream send = new DataOutputStream(socket.getOutputStream());
-        send.writeBytes(message + "\n");
-        send.close();
+        sendStream.writeBytes(message + "\n");
+        sendStream.close();
     }
 
     public void writeFile(byte[] buffer) throws IOException {
-        DataOutputStream send = new DataOutputStream(socket.getOutputStream());
         for (byte b : buffer) {
-            send.write(b);
+            sendStream.write(b);
         }
-        send.close();
+        sendStream.close();
     }
 }

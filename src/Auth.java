@@ -1,15 +1,10 @@
 public class Auth {
-    String user;
     String acct;
     String pass;
     boolean t_user = false;
     boolean t_acct = false;
     boolean t_pass = false;
     boolean auth = false;
-
-    public void setUser(String user) {
-        this.user = user;
-    }
 
     public void setAcct(String acct) {
         this.acct = acct;

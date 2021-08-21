@@ -8,12 +8,12 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 class TCPClient {
+    static final String outputDir = "D:/temp/s/output/";
     static Socket clientSocket;
-    static String outputDir = "D:/temp/s/output/";
     static File file;
     static int fileSize;
     static String output;
@@ -39,7 +39,7 @@ class TCPClient {
         String userInputText = new BufferedReader(new InputStreamReader(System.in)).readLine();
         if (fileSize == new File(userInputText).length()) {
             try {
-                byte[] buffer = Files.readAllBytes(Path.of(userInputText));
+                byte[] buffer = Files.readAllBytes(Paths.get(userInputText));
                 BufferedOutputStream bos = new BufferedOutputStream(sendStream);
                 for (byte b : buffer) {
                     bos.write(b);
@@ -63,10 +63,17 @@ class TCPClient {
             String cmd = userInputText.substring(0, 4);
             String args = userInputText.substring(4);
             switch (cmd.toUpperCase()) {
-                case "RETR" -> retr(args);
-                case "SEND" -> send();
-                case "SIZE" -> size(args);
-                default -> standard();
+                case "RETR":
+                    retr(args);
+                    break;
+                case "SEND":
+                    send();
+                    break;
+                case "SIZE":
+                    size(args);
+                    break;
+                default:
+                    standard();
             }
         } catch (StringIndexOutOfBoundsException e) {
             standard();
