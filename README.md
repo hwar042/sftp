@@ -7,12 +7,19 @@ https://datatracker.ietf.org/doc/html/rfc913
 
 ## Installation and Startup
 
-The System has been configured to operate with JDK 16.
+The System has been built with JDK 8 (Java 1.8).
 * Clone the repository to a local disk
 * Open the repository in an IDE (InteliJ used for this project)
 * Build and Launch TCPServer
 * Build and Launch TCPClient
 * Enter Commands from the terminal window of TCP Client
+
+## Server Behaviour
+* Expected Welcome Message: `+hwar042 SFTP Service`
+* Server requires a message from client (can be empty) to establish connection
+* Full access to the server is only possible after a successful login (`!`).
+* The Server will disconnect with an error message (`-`).
+* Disconnection will reset user directory, login authentication and specified files.
 
 ## Commands
 
@@ -43,7 +50,7 @@ The Following Commands are only available immediately after `NAME`:
 The Following Commands are only available immediately after `RETR`:
 | Command | Description   | Returns  |
 | --------|-------------  | ------   |
-| `SEND` | Sends requested file | `<requested file>` * |
+| `SEND` | Sends requested file | `<requested file>` (to specified directory)* </br> **and** `+File received` |
 
 <sub>\* The location to store the file is specified as a field in TCPClient.java<sub>
  
