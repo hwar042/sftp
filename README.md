@@ -38,6 +38,7 @@ There are 3 Users provided, and 2 Accounts. The details are:
 * The admin account does not require an account or password.
 * An account can be used with any user.
 * Passwords are specific to an account.
+* Passwards are case-sensitive, users and accounts are not.
 
 Users and Accounts are stored in plaintext in `/database/users.txt` `/database/accts.txt` (respectively) in the form:
 
