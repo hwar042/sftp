@@ -2,17 +2,20 @@
 
 ## Overview
 
-These commands have been implemented according to IETF:
+These commands have been implemented according to IETF RFC 913:
 https://datatracker.ietf.org/doc/html/rfc913
+* The System has been built with JDK 8 (Java 1.8)
+* The System has been configured using `localhost:6789` as default IP address and port
 
 ## Installation and Startup
 
-The System has been built with JDK 8 (Java 1.8).
 * Clone the repository to a local disk
-* Open the repository in an IDE (InteliJ used for this project)
-* Build and Launch TCPServer
-* Build and Launch TCPClient
-* Enter Commands from the terminal window of TCP Client
+* Navigate to `sftp/src/` (where sftp is the cloned directory)
+* Build the client from the command line: `javac TCPClient.java`
+* Build the server from the command line: `javac TCPServer.java`
+* Start the server from the command line: `java TCPServer`
+* From a **separate** terminal instance, start the client from the command line: `java TCPClient`
+* Enter Client commands from the client terminal
 
 ## Server Behaviour
 * Expected Welcome Message: `+hwar042 SFTP Service`
@@ -21,7 +24,41 @@ The System has been built with JDK 8 (Java 1.8).
 * The Server will disconnect with an error message (`-`).
 * Disconnection will reset user directory, login authentication and specified files.
 
+## User and Account Details
+
+There are 3 Users provided, and 2 Accounts. The details are:
+
+| User   | Account     | Password     |
+| -----  |---------    | --------     |
+| admin  |*not needed* | *not needed* |
+| albert | acct        | pass         |
+| bob    | kobe        | bryant       |
+
+* A user is required before an account or password.
+* The admin account does not require an account or password.
+* An account can be used with any user.
+* Passwords are specific to an account.
+* Passwards are case-sensitive, users and accounts are not.
+
+Users and Accounts are stored in plaintext in `/database/users.txt` `/database/accts.txt` (respectively) in the form:
+
+| User   | Admin  |
+| -----  |------- |
+| admin  | * |
+| albert | |
+| bob | |
+
+where an `*` denotes no requirement for an account or password.
+
+| Account   | Password  |
+| -----  |------- |
+| acct | pass |
+| kobe | bryant |
+
 ## Commands
+* Commands are entered in the client console followed by the <kbd>↵ ENTER</kbd> key.
+* Commands are **not** case sensitive.
+* An unrecognized command will get the response: `-Unknown command, try again`
 
 The Following commands can be executed at any time:
 | Command | Description   | Returns  |
@@ -57,6 +94,24 @@ The Following Commands are only available immediately after `RETR`:
 The Following Commands are only available immediately after `STORE` (each command must follow the previous):
 | Command | Description   | Returns  |
 | --------|-------------  | ------   |
-| `SIZE <file-size>` | Specifies the size of the file to be stored (must match) | `+ok, waiting for file` </br> `-Not enough room, don't send it` </br> `-Incorrect number format`|
+| `SIZE <file-size>` | Specifies the size of the file to be stored (must match) | `+ok, waiting for file` </br> **and** `Enter Absolute Filepath of File to Send` </br> `-Not enough room, don't send it` </br> `-Incorrect number format`|
  | `<path-of-file-to-be-sent>` | Sends the file at the specified path | `+Saved <file-spec>` </br> `-Couldn't save because of an I/O error`|
 
+## File Structure
+```
+    sftp
+    ├── database
+    │   ├── accts.txt
+    │   └── users.txt
+    └── src
+        ├── database
+        │   ├── accts.txt
+        │   └── users.txt
+        ├── Auth.java
+        ├── Connection.java
+        ├── questions.txt
+        ├── Reader.java
+        ├── TCPClient.java
+        └── TCPServer.java
+
+```
