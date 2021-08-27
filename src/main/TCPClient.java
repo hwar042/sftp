@@ -1,4 +1,4 @@
-/*
+package main;/*
   Code is taken from Computer Networking: A Top-Down Approach Featuring
   the Internet, second edition, copyright 1996-2002 J.F Kurose and K.W. Ross,
   All Rights Reserved.
@@ -11,7 +11,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
-class TCPClient {
+public class TCPClient {
     static final String outputDir = "D:/temp/s/output/";
     static Socket clientSocket;
     static File file;
@@ -19,9 +19,9 @@ class TCPClient {
     static String output;
     static boolean sendFile;
 
-    public static void main(String[] argv) throws Exception {
-        //noinspection InfiniteLoopStatement
-        while (true) {
+    public static void main(String[] argv) throws IOException {
+        //noinspection LoopConditionNotUpdatedInsideLoop
+        do {
             clientSocket = new Socket("localhost", 6789);
             DataOutputStream sendStream = new DataOutputStream(clientSocket.getOutputStream());
             if (sendFile) {
@@ -31,7 +31,7 @@ class TCPClient {
                 sendText(sendStream);
             }
             clientSocket.close();
-        }
+        } while (argv.length < 1);
     }
 
     private static void sendFile(DataOutputStream sendStream) throws IOException {
@@ -75,7 +75,7 @@ class TCPClient {
                 default:
                     standard();
             }
-        } catch (StringIndexOutOfBoundsException e) {
+        } catch (StringIndexOutOfBoundsException | NullPointerException e) {
             standard();
         }
     }
@@ -96,6 +96,7 @@ class TCPClient {
             }
             bos.close();
             fos.close();
+            System.out.println("+File received");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -118,6 +119,7 @@ class TCPClient {
                 output = reader.nextLine();
                 System.out.println(output);
             }
+            reader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

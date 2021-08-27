@@ -1,4 +1,4 @@
-/*
+package main;/*
   Code is taken from Computer Networking: A Top-Down Approach Featuring
   the Internet, second edition, copyright 1996-2002 J.F Kurose and K.W. Ross,
   All Rights Reserved.
@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 
-class TCPServer {
+public class TCPServer {
     static Connection connection;
     static Auth auth;
     static ArrayList<String[]> users;
@@ -49,7 +49,7 @@ class TCPServer {
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
-    public static void main(String[] argv) throws Exception {
+    public static void main(String[] argv) throws IOException {
         initDatabase();
         ServerSocket welcomeSocket = new ServerSocket(6789);
         while (true) {
@@ -81,7 +81,7 @@ class TCPServer {
         }
     }
 
-    private static void getFile() throws IOException {
+    private static void getFile() {
         try {
             connection.getFile(storFile, storSize, storAppend);
             output = "+Saved " + storFile.getName();
@@ -93,7 +93,7 @@ class TCPServer {
         storAppend = false;
     }
 
-    private static void getText() throws IOException {
+    private static void getText() {
         // Get Input
         input = connection.getInput();
         try {
@@ -101,7 +101,7 @@ class TCPServer {
         }
         // Catch incorrectly formed argument
         catch (StringIndexOutOfBoundsException e) {
-            output = ("-Error! use format: <cmd> [<SPACE> <args>]");
+           unknown();
         }
     }
 
@@ -229,7 +229,7 @@ class TCPServer {
         }
         // Log in account
         else {
-            auth.setAcct(acct);
+            auth.setAcct(acct.toLowerCase());
             // Log in if matching password
             if (auth.t_pass) {
                 auth.setAuth();
@@ -238,7 +238,7 @@ class TCPServer {
                 // Pass account, request password
                 auth.setT_acct();
                 // Set Required Password
-                setPass(acct);
+                setPass();
                 output = "+Account valid, send password";
             }
         }
@@ -454,7 +454,7 @@ class TCPServer {
     private static boolean checkInvalid(String string, ArrayList<String[]> data) {
         // Checks Data Structures for Strings, confirms if found
         for (String[] strings : data) {
-            if (strings[0].contains(string)) {
+            if (strings[0].equalsIgnoreCase(string)) {
                 return false;
             }
         }
@@ -464,7 +464,7 @@ class TCPServer {
     private static boolean checkSuperUser(String user) {
         // Checks if User can bypass password (* in String array)
         for (String[] strings : users) {
-            if (strings[0].contains(user) && strings.length > 1) {
+            if (strings[0].equalsIgnoreCase(user) && strings.length > 1) {
                 return true;
             }
         }
@@ -481,10 +481,10 @@ class TCPServer {
         return false;
     }
 
-    private static void setPass(String acct) {
+    private static void setPass() {
         // Sets required password for account
         for (String[] strings : accts) {
-            if (strings[0].contains(acct)) {
+            if (strings[0].contains(auth.acct)) {
                 auth.setPass(strings[1]);
             }
         }

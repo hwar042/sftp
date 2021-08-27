@@ -1,3 +1,5 @@
+package main;
+
 public class Auth {
     String acct;
     String pass;
