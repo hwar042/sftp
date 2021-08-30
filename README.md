@@ -35,6 +35,7 @@ There are 3 Users provided, and 2 Accounts. The details are:
 | bob    | kobe        | bryant       |
 
 * A user is required before an account or password.
+* A password can be sent before an account.
 * The admin user does not require an account or password.
 * An account can be used with any user.
 * Passwords are specific to an account.
