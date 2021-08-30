@@ -11,8 +11,8 @@ https://datatracker.ietf.org/doc/html/rfc913
 
 * Clone the repository to a local disk
 * Open a terminal window in `[repo directory]/src/`
-* Build the client from the command line: `javac src/main/TCPClient.java`
-* Build the server from the command line: `javac src/main/TCPServer.java`
+* Build the client from the command line: `javac main/TCPClient.java`
+* Build the server from the command line: `javac main/TCPServer.java`
 * Start the server from the command line: `java TCPServer`
 * From a **separate** terminal instance, start the client from the command line: `java TCPClient`
 * Enter Client commands from the client terminal
