@@ -22,7 +22,7 @@ https://datatracker.ietf.org/doc/html/rfc913
 * Server requires a message from client (can be empty) to establish connection
 * Full access to the server is only possible after a successful login (`!`).
 * The Server will disconnect with an error message (`-`).
-* Disconnection will reset user directory, login authentication and specified files.
+* Disconnection will reset chosen directory, login authentication and specified files.
 
 ## User and Account Details
 
