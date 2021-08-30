@@ -10,9 +10,9 @@ https://datatracker.ietf.org/doc/html/rfc913
 ## Installation and Startup
 
 * Clone the repository to a local disk
-* Navigate to `sftp/src/` (where sftp is the cloned directory)
-* Build the client from the command line: `javac TCPClient.java`
-* Build the server from the command line: `javac TCPServer.java`
+* Open a terminal window in the repo directory
+* Build the client from the command line: `javac src/main/TCPClient.java`
+* Build the server from the command line: `javac src/main/TCPServer.java`
 * Start the server from the command line: `java TCPServer`
 * From a **separate** terminal instance, start the client from the command line: `java TCPClient`
 * Enter Client commands from the client terminal
@@ -22,7 +22,7 @@ https://datatracker.ietf.org/doc/html/rfc913
 * Server requires a message from client (can be empty) to establish connection
 * Full access to the server is only possible after a successful login (`!`).
 * The Server will disconnect with an error message (`-`).
-* Disconnection will reset user directory, login authentication and specified files.
+* Disconnection will reset chosen directory, login authentication and specified files.
 
 ## User and Account Details
 
@@ -35,10 +35,10 @@ There are 3 Users provided, and 2 Accounts. The details are:
 | bob    | kobe        | bryant       |
 
 * A user is required before an account or password.
-* The admin account does not require an account or password.
+* The admin user does not require an account or password.
 * An account can be used with any user.
 * Passwords are specific to an account.
-* Passwards are case-sensitive, users and accounts are not.
+* Passwords are case-sensitive, users and accounts are not.
 
 Users and Accounts are stored in plaintext in `/database/users.txt` `/database/accts.txt` (respectively) in the form:
 
