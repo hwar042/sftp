@@ -1,4 +1,0 @@
-Do we disconnect when we get an error or if next command isn't USER
-Do we say wrong account when already have password or replace account and ask for password
-What do we say when bad command given
-Is user required before acct? And if so what error?

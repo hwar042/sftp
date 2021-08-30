@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 
 public class TCPClient {
-    static final String outputDir = "D:/temp/s/output/";
+    static final String outputDir = "tests/downloads/";
     static Socket clientSocket;
     static File file;
     static int fileSize;
@@ -37,7 +37,9 @@ public class TCPClient {
     private static void sendFile(DataOutputStream sendStream) throws IOException {
         System.out.println("Enter Absolute Filepath of File to Send");
         String userInputText = new BufferedReader(new InputStreamReader(System.in)).readLine();
-        if (fileSize == new File(userInputText).length()) {
+        File fileToSend = new File(userInputText);
+        long length = fileToSend.length();
+        if (fileSize == fileToSend.length()) {
             try {
                 byte[] buffer = Files.readAllBytes(Paths.get(userInputText));
                 BufferedOutputStream bos = new BufferedOutputStream(sendStream);

@@ -330,7 +330,7 @@ public class TCPServer {
 
     private static void cdir(String args) {
         File dir = new File(args.substring(1));
-        if (dir.exists()) {
+        if (dir.isDirectory()) {
             currentDir = dir;
             output = "!Changed working dir to " + dir.getPath();
         } else {
@@ -341,7 +341,7 @@ public class TCPServer {
     private static void kill(String args) {
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
         if (file.delete()) {
-            output = "+" + file + " deleted";
+            output = "+" + file.getName() + " deleted";
         } else if (!file.exists()) {
             output = "-Not deleted because file does not exist";
         }
@@ -353,17 +353,17 @@ public class TCPServer {
             output = "+File exists";
             nameFile = file;
         } else {
-            output = "-Can't find " + file;
+            output = "-Can't find " + file.getName();
             nameFile = null;
         }
     }
 
     private static void tobe(String args) {
-        String oldFile = nameFile.getPath();
+        String oldFile = nameFile.getName();
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
         if (nameFile != null) {
-            if (nameFile.renameTo(file)) {
-                output = "+" + oldFile + " was renamed to " + file.getPath();
+            if (!file.exists() && nameFile.renameTo(file)) {
+                output = "+" + oldFile + " was renamed to " + file.getName();
             } else {
                 output = "-File wasn't renamed because file with dest path already exists";
             }
