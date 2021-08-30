@@ -16,6 +16,8 @@ https://datatracker.ietf.org/doc/html/rfc913
 * Start the server from the command line: `java TCPServer`
 * From a **separate** terminal instance, start the client from the command line: `java TCPClient`
 * Enter Client commands from the client terminal
+* By default the client program is modified not to exit after receiving a response
+* To restore its original behaviour, start the client with `java TCPClient -test`
 
 ## Server Behaviour
 * Expected Welcome Message: `+hwar042 SFTP Service`
