@@ -60,7 +60,9 @@ where an `*` denotes no requirement for an account or password.
 
 ## Testing
 
-25 JUnit tests have been included, as well as a JUnit binary to launch tests from the commandline. Instructions for testing server functions:
+25 JUnit tests have been included, as well as a JUnit binary to launch tests from the commandline. Tested on Ubuntu 1804LTS 
+
+### Instructions for testing server functions:
 
 * It is **strongly recommended** to test with a clean repo
 * Build Client and Server and Start Server as per [installation instructions](#Installation and Startup)
