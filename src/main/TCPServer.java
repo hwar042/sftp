@@ -14,19 +14,19 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class TCPServer {
-    static Connection connection;
-    static Auth auth;
-    static ArrayList<String[]> users;
-    static ArrayList<String[]> accts;
-    static String input;
-    static String output;
-    static File currentDir;
-    static File nameFile;
-    static byte[] sendFile;
-    static File retrFile;
-    static File storFile;
-    static boolean storAppend;
-    static long storSize;
+    static Connection connection; // Stores Connection info (socket + read/write to client)
+    static Auth auth; // Stores Authentication info for session
+    static ArrayList<String[]> users; // Stores available users
+    static ArrayList<String[]> accts; // Stores available accts and Passwords
+    static String input; // Input from client
+    static String output; // Output to client
+    static File currentDir; // Selected directory
+    static File nameFile; // File to be renamed
+    static byte[] sendFile; // File to send to Client (as bytes)
+    static File retrFile; // File to send to Client
+    static File storFile; // File to receive from Client
+    static boolean storAppend; // Whether to Append to existing file
+    static long storSize; // Size of file to receive
 
     private static void initDatabase() {
         // Reads Users and Accounts into memory
@@ -50,14 +50,15 @@ public class TCPServer {
 
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] argv) throws IOException {
-        initDatabase();
+        initDatabase(); // Init database
         ServerSocket welcomeSocket = new ServerSocket(6789);
+        // Outer Loop Keeps Server alive, Inner loop keeps client connected
         while (true) {
-            initServer();
+            initServer(); // Init server
             try {
                 // Receive Client Connection
                 connection = new Connection(welcomeSocket.accept());
-                connection.getInput();
+                connection.getInput(); // Read client input
                 // First output should be connection info:
                 connection.writeOutput("+hwar042 SFTP Service");
                 // Start another loop while connected
@@ -66,11 +67,11 @@ public class TCPServer {
                     connection = new Connection(welcomeSocket.accept());
                     // Check if File expected
                     if (storSize > 0) {
-                        getFile();
+                        getFile(); // Read file from client
                     } else {
-                        getText();
+                        getText(); // Read text from client
                     }
-                    writeOutput();
+                    writeOutput(); // Write response to client
                 }
             }
             // Restart Server if Client disconnects
@@ -81,13 +82,14 @@ public class TCPServer {
         }
     }
 
-    private static void getFile() {
+    private static void getFile() { // Receive File from client
         try {
-            connection.getFile(storFile, storSize, storAppend);
-            output = "+Saved " + storFile.getName();
+            connection.getFile(storFile, storSize, storAppend); // Store File
+            output = "+Saved " + storFile.getName(); // Write Response
         } catch (IOException e) {
             output = "-Couldn't save because of an I/O error";
         }
+        // Reset File parameters
         storFile = null;
         storSize = 0;
         storAppend = false;
@@ -108,9 +110,9 @@ public class TCPServer {
     private static void writeOutput() throws IOException {
         // Check if file is being sent
         if (sendFile != null) {
-            connection.writeFile(sendFile);
-            sendFile = null;
-        } else {
+            connection.writeFile(sendFile); // Send File to Client
+            sendFile = null; // Clear file being sent
+        } else { // Send Text to Client
             // Disconnect Client if '-' received
             if (output.charAt(0) == '-') connection.connected = false;
             // Send Message to Client
@@ -125,6 +127,7 @@ public class TCPServer {
         // Get Number of Arguments
         int argCount = args.replaceAll("[^ ]", "").length();
         // Call Method Based on Command
+        // Limited Selection when not logged in
         if (!auth.auth) {
             switch (cmd.toUpperCase()) {
                 case "USER":
@@ -139,7 +142,9 @@ public class TCPServer {
                 default:
                     unknown();
             }
-        } else {
+        }
+        // Full Command List
+        else {
             switch (cmd.toUpperCase()) {
                 case "USER":
                     user(args, argCount);
@@ -177,6 +182,9 @@ public class TCPServer {
                 case "SEND":
                     send();
                     break;
+                case "STOP":
+                    stop();
+                    break;
                 case "STOR":
                     stor(args);
                     break;
@@ -190,7 +198,7 @@ public class TCPServer {
     }
 
     private static void unknown() {
-        output = "-Unknown command, try again";
+        output = "-Unknown command, try again"; // Output when unknown message received
     }
 
     private static void user(String args, int argCount) {
@@ -273,6 +281,7 @@ public class TCPServer {
     }
 
     private static void type(String args, int argCount) {
+        // Output mode specified
         switch (args.substring(1).toUpperCase()) {
             case "A":
                 output = "+Using ASCII mode";
@@ -305,31 +314,37 @@ public class TCPServer {
             catch (StringIndexOutOfBoundsException e) {
                 path = currentDir;
             }
+            // Get files in directory
             File[] files = path.listFiles();
             StringBuilder fileList = new StringBuilder();
             // Check directory not empty
             if (files != null) {
+                // First line of output is +path
                 fileList.append("+").append(path).append("\n");
+                // Append Directory Listing
                 for (File f : files) {
                     String file = f.getName();
                     // Append / to directory
                     if (f.isDirectory()) file = file + "/";
                     // Formatted listing
                     if (listing.equalsIgnoreCase("f")) fileList.append(file).append(" \r\n");
-                        // Verbose listing
+                    // Verbose listing - last modified date and size in bytes
                     else {
                         fileList.append(file).append(" ").
                                 append(new Date(f.lastModified())).append(" ").
                                 append(f.length()).append(" bytes").append(" \r\n");
                     }
                 }
+                // Convert String builder to String for output
                 output = fileList.toString();
             } else output = "-non-existent directory";
         } else output = "-invalid file listing format";
     }
 
     private static void cdir(String args) {
+        // Get directory from input
         File dir = new File(args.substring(1));
+        // Change to directory if it exists
         if (dir.isDirectory()) {
             currentDir = dir;
             output = "!Changed working dir to " + dir.getPath();
@@ -339,7 +354,9 @@ public class TCPServer {
     }
 
     private static void kill(String args) {
+        // Get file from input
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
+        // Attempt to delete file
         if (file.delete()) {
             output = "+" + file.getName() + " deleted";
         } else if (!file.exists()) {
@@ -348,7 +365,9 @@ public class TCPServer {
     }
 
     private static void name(String args) {
+        // Get file from input
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
+        // Attempt to store file for renaming
         if (file.exists()) {
             output = "+File exists";
             nameFile = file;
@@ -359,8 +378,11 @@ public class TCPServer {
     }
 
     private static void tobe(String args) {
+        // Store oldFile name for output
         String oldFile = nameFile.getName();
+        // Get new name from input
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
+        // Attempt to rename file
         if (nameFile != null) {
             if (!file.exists() && nameFile.renameTo(file)) {
                 output = "+" + oldFile + " was renamed to " + file.getName();
@@ -370,16 +392,20 @@ public class TCPServer {
         } else {
             unknown();
         }
+        // Clear file being renamed
         nameFile = null;
     }
 
     private static void done() {
+        // Close connection
         output = "+closing connection";
         connection.connected = false;
     }
 
     private static void retr(String args) {
+        // Get file to be retrieved from input
         File file = new File(currentDir.getPath() + "/" + args.substring(1));
+        // Attempt to set file for retrieval
         if (file.exists() && !file.isDirectory()) {
             retrFile = file;
             output = String.valueOf(file.length());
@@ -390,12 +416,19 @@ public class TCPServer {
     }
 
     private static void send() {
+        // Attempt to retrieve file
         try {
             sendFile = Files.readAllBytes(Paths.get(retrFile.getAbsolutePath()));
         } catch (IOException e) {
             e.printStackTrace();
             unknown();
         }
+        retrFile = null;
+    }
+
+    private static void stop() {
+        retrFile = null;
+        output = "+ok, RETR aborted";
     }
 
     private static void stor(String args) {
