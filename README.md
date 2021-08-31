@@ -66,7 +66,7 @@ where an `*` denotes no requirement for an account or password.
 * Build Client and Server and Start Server as per [installation instructions](#Installation and Startup)
 From a terminal window (from the repo dir)
 * Compile The JUnit Test: `javac -cp junit-platform-console-standalone-1.7.2.jar:src src/test/SimpleProgramTest.java`
-* Run The JUnit Test: `java -jar junit-platform-console-standalone-1.7.2.jar -cp src --scan-classpath
+* Run The JUnit Test: `java -jar junit-platform-console-standalone-1.7.2.jar -cp src --scan-classpath`
 
 ## Commands
 * Commands are entered in the client console followed by the <kbd>↵ ENTER</kbd> key.
