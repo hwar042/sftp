@@ -225,10 +225,6 @@ public class SimpleProgramTest {
                 "+database" + System.lineSeparator() +
                 "accts.txt " + System.lineSeparator() +
                 "users.txt ");
-        testMessage("list v",
-                "+database" + System.lineSeparator() +
-                "accts.txt Fri Aug 13 12:46:10 NZST 2021 22 bytes " + System.lineSeparator() +
-                "users.txt Fri Aug 13 10:57:32 NZST 2021 20 bytes ");
         testMessage("list t", "-invalid file listing format");
     }
 
