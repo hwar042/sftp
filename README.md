@@ -60,7 +60,7 @@ where an `*` denotes no requirement for an account or password.
 
 ## Testing
 
-25 JUnit tests have been included, as well as a JUnit binary to launch tests from the commandline. Tested on Ubuntu 1804LTS 
+25 JUnit tests have been included, as well as a JUnit binary to launch tests from the commandline. Tested on Ubuntu 1804LTS
 
 ### Instructions for testing server functions:
 
@@ -69,6 +69,10 @@ where an `*` denotes no requirement for an account or password.
 From a terminal window (from the repo dir)
 * Compile The JUnit Test: `javac -cp junit-platform-console-standalone-1.7.2.jar:src src/test/SimpleProgramTest.java`
 * Run The JUnit Test: `java -jar junit-platform-console-standalone-1.7.2.jar -cp src --scan-classpath`
+
+#### Tests Passing:
+
+![Proof of Tests Passing](https://github.com/hwar042/sftp/raw/main/tests/testProof.png)
 
 ## Commands
 * Commands are entered in the client console followed by the <kbd>↵ ENTER</kbd> key.
@@ -103,6 +107,7 @@ The Following Commands are only available immediately after `RETR`:
 | Command | Description   | Returns  |
 | --------|-------------  | ------   |
 | `SEND` | Sends requested file | `<requested file>` (to specified directory)* </br> **and** `+File received` |
+| `STOP` | Stops the retrieval | `+ok, RETR aborted` |
 
 <sub>\* The location to store the file is specified as a field in TCPClient.java<sub>
  
