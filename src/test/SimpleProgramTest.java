@@ -76,6 +76,13 @@ public class SimpleProgramTest {
         deleteFilesInFolder(new File("tests/downloads"));
     }
 
+    @Before
+    public void createDirectories() {
+        new File("tests/downloads").mkdir();
+        new File("tests/testKill").mkdir();
+        new File("tests/uploads").mkdir();
+    }
+
     // Taken from:
     // https://stackoverflow.com/a/13195870
     public void deleteFilesInFolder(File dir) {
