@@ -416,27 +416,42 @@ public class TCPServer {
     }
 
     private static void send() {
-        // Attempt to retrieve file
-        try {
-            sendFile = Files.readAllBytes(Paths.get(retrFile.getAbsolutePath()));
-        } catch (IOException e) {
-            e.printStackTrace();
-            unknown();
+        // Only works after retr
+        if (retrFile != null) {
+            // Attempt to retrieve file
+            try {
+                sendFile = Files.readAllBytes(Paths.get(retrFile.getAbsolutePath()));
+            } catch (IOException e) {
+                // No specification for error
+                e.printStackTrace();
+                unknown();
+            }
+            // Clear file to be sent to client
+            retrFile = null;
         }
-        retrFile = null;
+        else unknown();
     }
 
     private static void stop() {
-        retrFile = null;
-        output = "+ok, RETR aborted";
+        // Only works after retr
+        if (retrFile !=null) {
+            // Clear file to be sent to client
+            retrFile = null;
+            output = "+ok, RETR aborted";
+        }
+        else unknown();
     }
 
     private static void stor(String args) {
+        // Get First arg as Stor command
         String cmd = args.substring(1, 4);
+        // Get file to store from input
         storFile = new File(currentDir.getPath() + "/" + args.substring(5));
+        // Check for file existing in write modes
         switch (cmd.toUpperCase()) {
             case "NEW": {
                 if (storFile.isFile()) {
+                    // Not built to support generations
                     output = "-File exists, but system doesn't support generations";
                 } else {
                     output = "+File does not exist, will create new file";
@@ -468,9 +483,12 @@ public class TCPServer {
     }
 
     private static void size(String args) {
+        // Will only work after STOR
         if (storFile != null) {
             try {
+                // Get size from input
                 storSize = Long.parseLong(args.substring(1));
+                // Check enough storage
                 if (currentDir.getFreeSpace() > storSize) {
                     output = "+ok, waiting for file";
                 } else {
