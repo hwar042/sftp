@@ -22,7 +22,9 @@ public class TCPClient {
     public static void main(String[] argv) throws IOException {
         //noinspection LoopConditionNotUpdatedInsideLoop
         do {
+            // Create Socket
             clientSocket = new Socket("localhost", 6789);
+            // Create stream to Server
             DataOutputStream sendStream = new DataOutputStream(clientSocket.getOutputStream());
             if (sendFile) {
                 sendFile(sendStream);
@@ -30,37 +32,44 @@ public class TCPClient {
             } else {
                 sendText(sendStream);
             }
+            // Close socket after transmission
             clientSocket.close();
-        } while (argv.length < 1);
+        } while (argv.length < 1); // Will Loop unless args passed to program
     }
 
     private static void sendFile(DataOutputStream sendStream) throws IOException {
+        // Get Path of file to send
         System.out.println("Enter Absolute Filepath of File to Send");
         String userInputText = new BufferedReader(new InputStreamReader(System.in)).readLine();
         File fileToSend = new File(userInputText);
-        long length = fileToSend.length();
+        // Check Correct filesize specified
         if (fileSize == fileToSend.length()) {
             try {
+                // Read File as bytes and send to Server
                 byte[] buffer = Files.readAllBytes(Paths.get(userInputText));
                 BufferedOutputStream bos = new BufferedOutputStream(sendStream);
                 for (byte b : buffer) {
                     bos.write(b);
                 }
                 bos.flush();
+                // Get Server Response
                 standard();
             } catch (NoSuchFileException e) {
                 System.out.println("No Such File, restarting client");
             }
         } else {
+            // Incorrect Size
             System.out.println("-File size mismatch, restarting client");
         }
     }
 
     private static void sendText(DataOutputStream sendStream) throws IOException {
+        // Read User input
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
         String userInputText = userInput.readLine();
         sendStream.writeBytes(userInputText + '\n');
         sendStream.flush();
+        // Check what user is sending for client-side changes
         try {
             String cmd = userInputText.substring(0, 4);
             String args = userInputText.substring(4);
@@ -77,19 +86,25 @@ public class TCPClient {
                 default:
                     standard();
             }
-        } catch (StringIndexOutOfBoundsException | NullPointerException e) {
+        }
+        // Catch substring command out of bounds or null text, and just do standard
+        catch (StringIndexOutOfBoundsException | NullPointerException e) {
             standard();
         }
     }
 
     private static void retr(String args) {
+        // Prepare to receive file
         file = new File(outputDir + args.substring(1));
+        // And get server output
         standard();
+        // If no error, store size returned by server
         if (output.charAt(0) != '-') fileSize = Integer.parseInt(output);
     }
 
     private static void send() throws IOException {
         try {
+            // Receive file from server
             FileOutputStream fos = new FileOutputStream(file, false);
             BufferedOutputStream bos = new BufferedOutputStream(fos);
             BufferedInputStream bis = new BufferedInputStream(clientSocket.getInputStream());
@@ -98,6 +113,7 @@ public class TCPClient {
             }
             bos.close();
             fos.close();
+            // Print confirmation
             System.out.println("+File received");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -105,15 +121,21 @@ public class TCPClient {
     }
 
     private static void size(String args) {
+        // Get filesize we are sending to server
         try {
             fileSize = Integer.parseInt(args.substring(1));
-        } catch (NumberFormatException ignored) {
         }
+        // Don't want to crash if no number entered
+        catch (NumberFormatException ignored) {
+        }
+        // Get server output
         standard();
+        // Tell Client we are sending a file next, not text
         if (output.charAt(0) != '-') sendFile = true;
     }
 
     private static void standard() {
+        // Get Server Response
         Scanner reader;
         try {
             reader = new Scanner(new InputStreamReader(clientSocket.getInputStream()));

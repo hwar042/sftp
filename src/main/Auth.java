@@ -1,8 +1,10 @@
 package main;
 
 public class Auth {
+    // Hold Account And Password
     String acct;
     String pass;
+    // Set true when Authenticated
     boolean t_user = false;
     boolean t_acct = false;
     boolean t_pass = false;
