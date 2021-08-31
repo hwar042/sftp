@@ -76,6 +76,7 @@ public class SimpleProgramTest {
         deleteFilesInFolder(new File("tests/downloads"));
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Before
     public void createDirectories() {
         new File("tests/downloads").mkdir();
@@ -236,7 +237,7 @@ public class SimpleProgramTest {
         File fileToDelete = new File("tests/testKill/test.test");
         assertTrue(fileToDelete.createNewFile());
         login();
-        testMessage("cdir tests/testKill", "!Changed working dir to tests\\testKill");
+        testMessage("cdir tests/testKill", "!Changed working dir to tests/testKill");
         testMessage("kill test.test", "+test.test deleted");
         testMessage("kill test.test", "-Not deleted because file does not exist");
     }
@@ -244,7 +245,7 @@ public class SimpleProgramTest {
     @Test
     public void testName() {
         login();
-        testMessage("cdir tests/testName", "!Changed working dir to tests\\testName");
+        testMessage("cdir tests/testName", "!Changed working dir to tests/testName");
         testMessage("name test.test", "+File exists");
         testMessage("tobe rename.test", "+test.test was renamed to rename.test");
         testMessage("name rename.test", "+File exists");
@@ -264,7 +265,7 @@ public class SimpleProgramTest {
     @Test
     public void testRetrText() throws IOException {
         login();
-        testMessage("cdir tests/testRetr", "!Changed working dir to tests\\testRetr");
+        testMessage("cdir tests/testRetr", "!Changed working dir to tests/testRetr");
         testMessage("retr test.txt","41");
         testMessage("send", "+File received");
         endConnection();
@@ -276,7 +277,7 @@ public class SimpleProgramTest {
     @Test
     public void testRetrJPEG() throws IOException {
         login();
-        testMessage("cdir tests/testRetr", "!Changed working dir to tests\\testRetr");
+        testMessage("cdir tests/testRetr", "!Changed working dir to tests/testRetr");
         testMessage("retr test.jpg","64535");
         testMessage("send", "+File received");
         byte[] originalFile = Files.readAllBytes(Paths.get("tests/testRetr/test.jpg"));
@@ -288,7 +289,7 @@ public class SimpleProgramTest {
     @Test
     public void testStorText() throws IOException {
         login();
-        testMessage("cdir tests/uploads", "!Changed working dir to tests\\uploads");
+        testMessage("cdir tests/uploads", "!Changed working dir to tests/uploads");
         testMessage("stor new test.txt", "+File does not exist, will create new file");
         testMessage("size 41", "+ok, waiting for file");
         testMessage("tests/testStor/test.txt","Enter Absolute Filepath of File to Send" + System.lineSeparator() + "+Saved test.txt");
@@ -301,7 +302,7 @@ public class SimpleProgramTest {
     @Test
     public void testStorJPG() throws IOException {
         login();
-        testMessage("cdir tests/downloads", "!Changed working dir to tests\\downloads");
+        testMessage("cdir tests/downloads", "!Changed working dir to tests/downloads");
         testMessage("stor new test.jpg", "+File does not exist, will create new file");
         testMessage("size 64535", "+ok, waiting for file");
         testMessage("tests/testStor/test.jpg","Enter Absolute Filepath of File to Send" + System.lineSeparator() + "+Saved test.jpg");
