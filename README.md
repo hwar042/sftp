@@ -11,10 +11,10 @@ https://datatracker.ietf.org/doc/html/rfc913
 
 * Clone the repository to a local disk
 * Open a terminal window in the repo directory
-* Build the client from the command line: `javac src/main/TCPClient.java`
-* Build the server from the command line: `javac src/main/TCPServer.java`
-* Start the server from the command line: `java TCPServer`
-* From a **separate** terminal instance, start the client from the command line: `java TCPClient`
+* Build the client from the command line: `javac src/main/TCPClient.java -cp src`
+* Build the server from the command line: `javac src/main/TCPServer.java -cp src`
+* Start the server from the command line: `java -cp src main/TCPServer`
+* From a **separate** terminal instance, start the client from the command line: `java -cp src main/TCPClient`
 * Enter Client commands from the client terminal
 * By default the client program is modified not to exit after receiving a response
 * To restore its original behaviour, start the client with `java TCPClient -test`
