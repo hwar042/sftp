@@ -58,6 +58,18 @@ where an `*` denotes no requirement for an account or password.
 | acct | pass |
 | kobe | bryant |
 
+## Testing
+
+25 JUnit tests have been included, as well as a JUnit binary to launch tests from the commandline. Tested on Ubuntu 1804LTS 
+
+### Instructions for testing server functions:
+
+* It is **strongly recommended** to test with a clean repo
+* Build Client and Server and Start Server as per [installation instructions](#Installation and Startup)
+From a terminal window (from the repo dir)
+* Compile The JUnit Test: `javac -cp junit-platform-console-standalone-1.7.2.jar:src src/test/SimpleProgramTest.java`
+* Run The JUnit Test: `java -jar junit-platform-console-standalone-1.7.2.jar -cp src --scan-classpath`
+
 ## Commands
 * Commands are entered in the client console followed by the <kbd>↵ ENTER</kbd> key.
 * Commands are **not** case sensitive.
