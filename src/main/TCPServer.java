@@ -101,7 +101,7 @@ public class TCPServer {
         }
         // Catch incorrectly formed argument
         catch (StringIndexOutOfBoundsException e) {
-           unknown();
+            unknown();
         }
     }
 
@@ -283,7 +283,7 @@ public class TCPServer {
             case "C":
                 output = "+Using Continuous mode";
                 break;
-            default :
+            default:
                 output = "-Type not valid";
         }
         if (argCount != 1) {
