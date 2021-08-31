@@ -60,7 +60,9 @@ where an `*` denotes no requirement for an account or password.
 
 ## Testing
 
-25 JUnit tests have been included, as well as a JUnit binary to launch tests from the commandline. Tested on Ubuntu 1804LTS 
+25 JUnit tests have been included, as well as a JUnit binary to launch tests from the commandline. Tested on Ubuntu 1804LTS
+
+![Proof of Tests Passing](https://github.com/hwar042/sftp/raw/main/tests/testProof.png)
 
 ### Instructions for testing server functions:
 
