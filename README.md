@@ -62,8 +62,6 @@ where an `*` denotes no requirement for an account or password.
 
 25 JUnit tests have been included, as well as a JUnit binary to launch tests from the commandline. Tested on Ubuntu 1804LTS
 
-![Proof of Tests Passing](https://github.com/hwar042/sftp/raw/main/tests/testProof.png)
-
 ### Instructions for testing server functions:
 
 * It is **strongly recommended** to test with a clean repo
@@ -71,6 +69,10 @@ where an `*` denotes no requirement for an account or password.
 From a terminal window (from the repo dir)
 * Compile The JUnit Test: `javac -cp junit-platform-console-standalone-1.7.2.jar:src src/test/SimpleProgramTest.java`
 * Run The JUnit Test: `java -jar junit-platform-console-standalone-1.7.2.jar -cp src --scan-classpath`
+
+#### Tests Passing:
+
+![Proof of Tests Passing](https://github.com/hwar042/sftp/raw/main/tests/testProof.png)
 
 ## Commands
 * Commands are entered in the client console followed by the <kbd>↵ ENTER</kbd> key.
